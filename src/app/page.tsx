@@ -1,3 +1,4 @@
+//this is the home page of a Next.js application using Tailwind CSS
 import Image from "next/image";
 
 export default function Home() {
