@@ -1,5 +1,11 @@
 //this is the home page of a Next.js application using Tailwind CSS
-import Image from "next/image";
+const HomePage = () => {
+  return <h1 className="text-4xl font-bold mb-4">Welcome to the Home Page</h1>
+
+}
+export default HomePage;
+
+/*import Image from "next/image";
 
 export default function Home() {
   return (
@@ -101,4 +107,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+}*/
