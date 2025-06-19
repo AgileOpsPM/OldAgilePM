@@ -1,0 +1,19 @@
+{
+  "name": "agilepm",
+  "version": "1.0.0",
+  "description": "Project and task management tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AgileOpsPM/AgilePM.git"
+  },
+  "author": "Naledi Tshapi, Ciaran Formby, Ashe-shaana Ndzenge, Luyanda Ndlovu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AgileOpsPM/AgilePM/issues"
+  },
+  "homepage": "https://github.com/AgileOpsPM/AgilePM#readme"
+}
