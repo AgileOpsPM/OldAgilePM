@@ -3,6 +3,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google'; // <-- IMPORT GOOGLE PROVIDER
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -10,6 +11,12 @@ const prisma = new PrismaClient();
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    // --- GOOGLE PROVIDER CONFIGURATION ---
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -26,21 +33,14 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user) {
-          console.error('No user found with that email');
-          return null;
-        }
-
-        // If the user exists but doesn't have a password (e.g., signed up via OAuth),
-        // they can't log in with credentials.
-        if (!user.hashedPassword) {
-          console.error('User found but has no password set.');
+        if (!user || !user.hashedPassword) {
+          console.error('User not found or has no password set.');
           return null;
         }
 
         const passwordsMatch = await bcrypt.compare(
           credentials.password,
-          user.hashedPassword // TypeScript now knows this is a string because of the check above
+          user.hashedPassword
         );
 
         if (!passwordsMatch) {
