@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  # This is the name of our service (our Next.js app)
+  web:
+    # Build the image from the Dockerfile in the current directory
+    build: .
+    # Name the container for easier reference
+    container_name: agile_pm_app
+    # Forward port 3000 from the container to port 3000 on your local machine
+    ports:
+      - "3000:3000"
+    # Mount the local directory into the container for live code reloading
+    # This is great for development.
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    # Load environment variables from the .env file
+    env_file:
+      - .env
+    # The command to run for development (overrides the Dockerfile's CMD)
+    # This starts the Next.js development server.
+    command: npm run dev
