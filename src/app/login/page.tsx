@@ -37,20 +37,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
           Sign In
         </h1>
 
         {error && (
-          <div className="mb-4 rounded-md bg-red-100 p-3 text-center text-sm text-red-700">
+          <div className="mb-4 rounded-md bg-red-100 p-3 text-center text-sm text-red-500">
             {error}
           </div>
         )}
 
         <form onSubmit={handleCredentialsSubmit}>
-          {/* Email and Password inputs remain the same */}
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -64,11 +63,11 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
               placeholder="you@example.com"
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-2"> {/* <-- Changed margin from mb-6 to mb-2 */}
             <label
               htmlFor="password"
               className="mb-2 block text-sm font-medium text-gray-700"
@@ -81,19 +80,25 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
               placeholder="••••••••"
             />
           </div>
+          
+          <div className="mb-6 text-right">
+            <Link href="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+              Forgot password?
+            </Link>
+          </div>
+
           <button
             type="submit"
-            className="w-full rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="w-full rounded-md bg-blue-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Sign In
           </button>
         </form>
         
-        {/* --- SEPARATOR AND GOOGLE BUTTON --- */}
         <div className="my-6 flex items-center">
           <div className="flex-grow border-t border-gray-300"></div>
           <span className="mx-4 flex-shrink text-sm text-gray-500">OR</span>
@@ -102,7 +107,7 @@ export default function LoginPage() {
 
         <button
           onClick={handleGoogleSignIn}
-          className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           <svg className="mr-2 h-5 w-5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M43.6113 20.083H42V20H24V28H35.303C33.6747 32.6733 29.2235 36 24 36C17.373 36 12 30.627 12 24C12 17.373 17.373 12 24 12C27.045 12 29.845 13.134 31.961 14.969L37.618 9.312C34.046 6.161 29.284 4 24 4C12.955 4 4 12.955 4 24C4 35.045 12.955 44 24 44C35.045 44 44 35.045 44 24C44 22.659 43.8627 21.35 43.6113 20.083Z" fill="#FFC107"/>
@@ -115,7 +120,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
             Sign up
           </Link>
         </p>

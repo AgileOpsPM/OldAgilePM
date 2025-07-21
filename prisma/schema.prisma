@@ -21,6 +21,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          String    @default("user") // For role-based access control
+  passwordResetToken         String?   @unique
+  passwordResetTokenExpiry   DateTime?
 }
 
 model Account {
