@@ -6,33 +6,26 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
-  // If the user is trying to access auth pages (/login, /register)
-  if (pathname.startsWith('/login') || pathname.startsWith('/register')) {
-    // And they ARE already logged in (they have a token)
-    if (token) {
-      // Redirect them to the dashboard
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-    // Otherwise, let them proceed
-    return NextResponse.next();
+  // If a logged-in user tries to visit the homepage, redirect them to the dashboard.
+  if (token && pathname === '/') {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
-  // Protect the dashboard page
-  if (pathname.startsWith('/dashboard')) {
-    // If the user is NOT logged in (they have no token)
-    if (!token) {
-      // Redirect them to the login page
-      return NextResponse.redirect(new URL('/login', req.url));
-    }
-    // Otherwise, let them proceed
-    return NextResponse.next();
+  // If a logged-in user tries to access auth pages (/login, /register), redirect them to the dashboard.
+  if (token && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+  
+  // If a user is NOT logged in and tries to access a protected dashboard page, redirect them to login.
+  if (!token && pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  // Allow all other requests to go through
+  // Otherwise, allow the request to proceed.
   return NextResponse.next();
 }
 
-// This configures the middleware to run only on specific paths
+// Apply middleware to all relevant pages.
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/register'],
+  matcher: ['/', '/dashboard/:path*', '/dashboard', '/login', '/register'],
 };
