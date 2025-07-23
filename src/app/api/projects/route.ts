@@ -1,63 +1,63 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from "next-auth/next";
-
-// Imports the authOptions defined.
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; 
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
-const DEFAULT_PHASES = [
-  { title: "Phase 1: Discovery & Planning", allocatedHours: 0 },
-  { title: "Phase 2: Design & Prototyping", allocatedHours: 0 },
-  { title: "Phase 3: Development & Implementation", allocatedHours: 0 },
-  { title: "Phase 4: Testing & QA", allocatedHours: 0 },
-  { title: "Phase 5: Deployment & Launch", allocatedHours: 0 },
-];
-
-export async function POST(req: Request) {
-  // Get the session by passing your authOptions to getServerSession.
-  // This is the standard way for the App Router.
+export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  if (!session || !session.user?.id) {
+    return new NextResponse(JSON.stringify({ error: 'Not authenticated' }), { status: 401 });
   }
+
+  const body = await request.json();
+  // Destructure the new date fields from the body
+  const { title, description, totalBilledHours, startDate, endDate } = body;
   const userId = session.user.id;
 
-  try {
-    const body = await req.json();
-    const { title, description, totalBilledHours } = body;
+  // --- Validation ---
+  if (!title || typeof title !== 'string' || title.trim() === '') {
+    return new NextResponse(JSON.stringify({ error: 'A valid title is required' }), { status: 400 });
+  }
 
-    if (!title || !totalBilledHours) {
-      return new NextResponse(
-        JSON.stringify({ error: "Title and Total Billed Hours are required" }),
-        { status: 400 }
-      );
+  const hours = parseFloat(totalBilledHours);
+  if (isNaN(hours) || hours <= 0) {
+    return new NextResponse(JSON.stringify({ error: 'A valid, positive number for total hours is required' }), { status: 400 });
+  }
+
+  // --- Date Validation ---
+  if (!startDate) {
+    return new NextResponse(JSON.stringify({ error: 'A start date is required' }), { status: 400 });
+  }
+  
+  const start = new Date(startDate);
+  // Check if endDate is provided and if it's before the startDate
+  if (endDate) {
+    const end = new Date(endDate);
+    if (end < start) {
+      return new NextResponse(JSON.stringify({ error: 'End date cannot be before the start date' }), { status: 400 });
     }
+  }
 
+  try {
     const newProject = await prisma.project.create({
       data: {
-        title,
-        description,
-        totalBilledHours: parseFloat(totalBilledHours),
+        title: title.trim(),
+        description: description || null,
+        totalBilledHours: hours,
         consultantId: userId,
-        phases: {
-          create: DEFAULT_PHASES,
-        },
-      },
-      include: {
-        phases: true,
+        // Save the new dates
+        startDate: start,
+        // Conditionally save endDate, otherwise it will be null
+        endDate: endDate ? new Date(endDate) : null,
       },
     });
 
-    return new NextResponse(JSON.stringify(newProject), { status: 201 });
-
+    return NextResponse.json(newProject, { status: 201 });
   } catch (error) {
-    console.error("Error creating project:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Failed to create project" }), 
-      { status: 500 }
-    );
+    console.error('Error creating project:', error);
+    return new NextResponse(JSON.stringify({ error: 'Failed to create project' }), { status: 500 });
   }
 }

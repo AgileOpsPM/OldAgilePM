@@ -3,10 +3,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
 import SignOutButton from '@/app/components/SignOutButton';
+import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
 
 async function getProjectsForUser(userId: string) {
+  // This function is safe, as it's only called with a valid userId.
   const projects = await prisma.project.findMany({
     where: {
       consultantId: userId,
@@ -20,20 +22,28 @@ async function getProjectsForUser(userId: string) {
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
-  const projects = await getProjectsForUser(session!.user!.id!);
+
+  // --- THIS IS THE CRITICAL SAFEGUARD ---
+  // If the session is null (e.g., expired) or doesn't contain a user and ID,
+  // we must immediately redirect to the login page.
+  // This prevents the code below from ever running with invalid data.
+  if (!session || !session.user?.id) {
+    redirect('/login');
+  }
+
+  // Because of the check above, we can now be 100% certain that "session.user.id" exists.
+  const projects = await getProjectsForUser(session.user.id);
 
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="container mx-auto p-4 md:p-8">
         {/* Page Header */}
         <div className="flex justify-between items-center mb-8">
-          {/* Left Side: Welcome Text */}
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-            <p className="text-lg text-gray-600">Welcome back, {session?.user?.name || 'Consultant'}.</p>
+            {/* We can also safely access user's name here */}
+            <p className="text-lg text-gray-600">Welcome back, {session.user.name || 'Consultant'}.</p>
           </div>
-
-          {/* Right Side: Action Buttons */}
           <div className="flex items-center gap-4">
             <Link 
               href="/dashboard/create-project"

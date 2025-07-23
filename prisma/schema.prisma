@@ -69,6 +69,8 @@ model Project {
   progress           Int      @default(0)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  startDate          DateTime 
+  endDate            DateTime? // A project MIGHT have an end date, but it's optional.
 
   // This creates the relationship to the User model
   consultant   User     @relation(fields: [consultantId], references: [id])
@@ -96,12 +98,12 @@ model Phase {
 
 model Task {
   id          String   @id @default(cuid())
-  description String
+  title       String
+  description String?  // Optional description field
   isCompleted Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // This links the Task back to a Phase
-  phase     Phase  @relation(fields: [phaseId], references: [id])
-  phaseId   String
+  phaseId String
+  phase   Phase  @relation(fields: [phaseId], references: [id], onDelete: Cascade)
 }
