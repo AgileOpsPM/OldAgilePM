@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Task } from '@prisma/client';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaRegStickyNote } from 'react-icons/fa';
+import TaskDescriptionModal from './TaskDescriptionModal';
 
 interface TaskItemProps {
   task: Task;
@@ -14,11 +15,12 @@ export default function TaskItem({ task }: TaskItemProps) {
   const [isCompleted, setIsCompleted] = useState(task.isCompleted);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleToggleComplete = async () => {
     setIsLoading(true);
     const previousState = isCompleted;
-    setIsCompleted(!previousState); // Optimistic update
+    setIsCompleted(!previousState);
 
     try {
       const response = await fetch(`/api/tasks/${task.id}`, {
@@ -27,9 +29,9 @@ export default function TaskItem({ task }: TaskItemProps) {
         body: JSON.stringify({ isCompleted: !previousState }),
       });
       if (!response.ok) throw new Error('Failed to update task.');
-      router.refresh(); // Refresh to update the "X / Y" count in the parent
+      router.refresh();
     } catch (err) {
-      setIsCompleted(previousState); // Revert on failure
+      setIsCompleted(previousState);
       setError('Could not update task. Please try again.');
     } finally {
       setIsLoading(false);
@@ -54,36 +56,47 @@ export default function TaskItem({ task }: TaskItemProps) {
   };
 
   return (
-    <div className={`
-      flex items-center justify-between p-3 bg-white rounded-md border border-gray-200 shadow-sm
-      transition-all duration-200
-      ${isCompleted ? 'bg-gray-50 opacity-60' : 'hover:bg-gray-50'}
-      ${isLoading ? 'animate-pulse' : ''}
-    `}>
-      <div className="flex items-center gap-3">
-        <input
-          type="checkbox"
-          checked={isCompleted}
-          onChange={handleToggleComplete}
-          disabled={isLoading}
-          className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-        />
-        <span className={`
-          text-base font-medium
-          ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-800'}
-        `}>
-          {task.title}
-        </span>
+    <>
+      <div className={`
+        flex items-center justify-between p-3 bg-white rounded-md border border-gray-200 shadow-sm
+        transition-all duration-200
+        ${isCompleted ? 'bg-gray-50 opacity-60' : 'hover:bg-gray-50'}
+        ${isLoading ? 'animate-pulse' : ''}
+      `}>
+        <div className="flex items-center gap-3 flex-grow">
+          <input
+            type="checkbox"
+            checked={isCompleted}
+            onChange={handleToggleComplete}
+            disabled={isLoading}
+            className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0"
+          />
+          <span className={`
+            text-base font-medium
+            ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-800'}
+          `}>
+            {task.title}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <button onClick={() => setIsModalOpen(true)} className="p-1 text-gray-400 hover:text-blue-600" aria-label="View/Edit notes">
+            <FaRegStickyNote />
+          </button>
+          <button 
+            onClick={handleDelete} 
+            disabled={isLoading}
+            className="p-1 text-gray-400 hover:text-red-600 disabled:opacity-50"
+            aria-label="Delete task"
+          >
+            <FaTrash />
+          </button>
+        </div>
+        {error && <p className="text-red-500 text-xs">{error}</p>}
       </div>
-      <button 
-        onClick={handleDelete} 
-        disabled={isLoading}
-        className="p-1 text-gray-400 hover:text-red-600 disabled:opacity-50"
-        aria-label="Delete task"
-      >
-        <FaTrash />
-      </button>
-      {error && <p className="text-red-500 text-xs">{error}</p>}
-    </div>
+
+      {isModalOpen && (
+        <TaskDescriptionModal task={task} onClose={() => setIsModalOpen(false)} />
+      )}
+    </>
   );
 }
