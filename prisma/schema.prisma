@@ -23,6 +23,7 @@ model User {
   role          String    @default("user") // For role-based access control
   passwordResetToken         String?   @unique
   passwordResetTokenExpiry   DateTime?
+  projects  Project[] // A user can have many projects
 }
 
 model Account {
@@ -58,4 +59,51 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Project {
+  id                 String   @id @default(cuid())
+  title              String
+  description        String?
+  totalBilledHours   Decimal  @default(0) // <-- New field for total project hours
+  progress           Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  startDate          DateTime 
+  endDate            DateTime? // A project MIGHT have an end date, but it's optional.
+
+  // This creates the relationship to the User model
+  consultant   User     @relation(fields: [consultantId], references: [id])
+  consultantId String
+
+  // This creates the one-to-many relationship with Phase
+  phases      Phase[]
+}
+
+model Phase {
+  id             String   @id @default(cuid())
+  title          String
+  allocatedHours Decimal  @default(0) // <-- New field for hours allocated to this phase
+  isCompleted    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // This links the Phase back to a Project
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+
+  // This creates the one-to-many relationship with Task
+  tasks     Task[]
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  // Optional description field
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  phaseId String
+  phase   Phase  @relation(fields: [phaseId], references: [id], onDelete: Cascade)
 }
