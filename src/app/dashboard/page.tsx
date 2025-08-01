@@ -2,9 +2,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
-import SignOutButton from '@/app/components/SignOutButton';
+import SignOutButton from '@/app/components/(project & task comps)/SignOutButton';
 import { redirect } from "next/navigation";
-import ProjectCard from '@/app/components/ProjectCard'; // Import the new card
+import ProjectCard from '@/app/components/(project & task comps)/ProjectCard'; // Import the new card
 import { FaPlus } from "react-icons/fa";
 
 const prisma = new PrismaClient();
