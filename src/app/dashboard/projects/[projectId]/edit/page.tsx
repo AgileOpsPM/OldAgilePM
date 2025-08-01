@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import EditProjectForm from '@/app/components/EditProjectForm';
+import EditProjectForm from '@/app/components/(project & task comps)/EditProjectForm';
 
 const prisma = new PrismaClient();
 

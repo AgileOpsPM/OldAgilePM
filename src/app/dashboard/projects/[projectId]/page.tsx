@@ -4,10 +4,10 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
-import PhaseEditor from '@/app/components/PhaseEditor';
-import AddPhaseForm from '@/app/components/AddPhaseForm';
-import ProjectHeader from '@/app/components/ProjectHeader';
-import SignOutButton from '@/app/components/SignOutButton'; // Import the new button
+import PhaseEditor from '@/app/components/(project & task comps)/PhaseEditor';
+import AddPhaseForm from '@/app/components/(project & task comps)/AddPhaseForm';
+import ProjectHeader from '@/app/components/(project & task comps)/ProjectHeader';
+import SignOutButton from '@/app/components/(project & task comps)/SignOutButton'; // Import the new button
 
 const prisma = new PrismaClient();
 
